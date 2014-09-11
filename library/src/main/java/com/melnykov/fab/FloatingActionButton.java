@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -301,9 +302,18 @@ public class FloatingActionButton extends ImageButton {
             }
             int translationY = visible ? 0 : height + getMarginBottom();
             if (animate) {
-                animate().setInterpolator(mInterpolator)
-                    .setDuration(TRANSLATE_DURATION_MILLIS)
-                    .translationY(translationY);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+                    animate().setInterpolator(mInterpolator)
+                            .setDuration(TRANSLATE_DURATION_MILLIS)
+                            .translationY(translationY);
+                } else {
+                    ViewGroup parent = (ViewGroup) mListView.getParent();
+                    com.nineoldandroids.view.ViewPropertyAnimator.animate(parent.getChildAt(1))
+                            .setInterpolator(mInterpolator)
+                            .setDuration(TRANSLATE_DURATION_MILLIS)
+                            .translationY(translationY);
+                }
             } else {
                 setTranslationY(translationY);
             }
